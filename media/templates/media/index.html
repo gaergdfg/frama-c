@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta http-equiv="content-type" content="text/html" charset="utf-8">
+	<title>My Little Web Page</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+	<div class="navbar">
+		<button onclick="runFile()">Run</button>
+		<a href="new_directory/">Create Directory</a>
+		<a href="new_file/">Upload File</a>
+		<a href="remove_directory/">Remove Directory</a>
+		<a href="remove_file/">Remove File</a>
+	</div>
+	<div id="grid-wrapper">
+		<div id="grid-wrapper-file-system">
+			{% for directory, file_list in file_sys.items %}
+				<button class="file-sys-element directory">{{ directory.name }}/</button>
+				{% for file in file_list %}
+					<button class="file-sys-element file" onclick="openFile(this)">{{ file.name }}</button>
+				{% endfor %}
+			{% endfor %}
+		</div>
+		<div id="grid-wrapper-editor" class="text-container code-container">No file selected.</div>
+		<div id="grid-wrapper-elements" class="text-container">No file selected.</div>
+		<div id="grid-wrapper-tab-data">
+			<div class="navbar">
+				<button id="tab-data-default" class="tab-link text text-container" onclick="openTab(this, 'tab-provers')">Provers</button>
+				<button class="tab-link text text-container" onclick="openTab(this, 'tab-vcs')">VCs</button>
+				<button class="tab-link text text-container" onclick="openTab(this, 'tab-result')">Result</button>
+			</div>
+			<div id="tab-provers" class="tab-content text-container">
+				<input class="prover-choice-radio" type="radio" name="prover-choice" value="alt-ergo">
+				<label for="alt-ergo">Alt-Ergo</label>
+				<input class="prover-choice-radio" type="radio" name="prover-choice" value="Z3">
+				<label for="Z3">Z3</label>
+				<input class="prover-choice-radio" type="radio" name="prover-choice" value="CVC4">
+				<label for="CVC4">CVC4</label>
+				<br><br>
+				<button class="button" type="button" onclick="setProver()">Set Prover</button>
+			</div>
+			<div id="tab-vcs" class="tab-content text-container">
+				<input class="vc-choice-checkbox" type="checkbox" value="wp-rte-flag">
+				<label for="wp-rte-flag">-wp-rte</label>
+				<br><br>
+				<input class="vc-choice-checkbox" type="checkbox" value="invariant-flag">
+				<label for="invariant-flag">-@invariant</label>
+				<input class="vc-choice-checkbox" type="checkbox" value="variant-flag">
+				<label for="variant-flag">-@variant</label>
+				<input class="vc-choice-checkbox" type="checkbox" value="assert-flag">
+				<label for="assert-flag">-@assert</label>
+				<input class="vc-choice-checkbox" type="checkbox" value="precondition-flag">
+				<label for="precondition-flag">-@precondition</label>
+				<input class="vc-choice-checkbox" type="checkbox" value="postcondition-flag">
+				<label for="postcondition-flag">-@postcondition</label>
+				<br><br>
+				<button class="button" type="button" onclick="setVCs()">Set VCs</button>
+			</div>
+			<div id="tab-result" class="tab-content text-container">No file selected.</div>
+		</div>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="{% static 'js/framac-util.js' %}"></script>
+	<script src="{% static 'js/tab-menu-actions.js' %}"></script>
+	<script src="{% static 'js/tab-menu.js' %}"></script>
+</body>
+
+</html>

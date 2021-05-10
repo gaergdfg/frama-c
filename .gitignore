@@ -1,0 +1,9 @@
+framac/__pycache__/
+framac/.env
+
+media/__pycache__/
+media/migrations/__pycache__/
+
+uploads/
+
+db.sqlite3

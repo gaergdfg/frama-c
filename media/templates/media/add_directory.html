@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta http-equiv="content-type" content="text/html" charset="utf-8">
+	<title>Create Directory</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+</head>
+
+<body>
+	<div style="height: 100%; width: 100%">
+		<form action="/new_directory/" method="POST">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<input type="submit" value="Submit">
+		</form>
+	</div>
+</body>
+
+</html>
