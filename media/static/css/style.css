@@ -111,6 +111,32 @@ div {
 	margin-left: 16px;
 }
 
+.focus-element {
+	position: relative;
+}
+
+.focus-element span {
+	visibility: hidden;
+	width: 120px;
+	background-color: var(--container-background-color);
+	color: var(--text-color);
+	text-align: center;
+	border-radius: 6px;
+	padding: 5px 0;
+	position: absolute;
+	z-index: 1;
+	top: -16px;
+	left: 50%;
+	margin-left: -60px;
+	opacity: 0;
+	transition: opacity 0.3s;
+}
+
+.focus-element:hover span {
+	visibility: visible;
+	opacity: 1;
+}
+
 .active, .navbar .active, .navbar a:hover, .navbar button:hover, .file:hover {
 	background: var(--text-color);
 	color: var(--container-background-color);
