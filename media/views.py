@@ -11,8 +11,36 @@ from .models import Directory, File, User
 
 
 def index(request):
+	try:
+		request.session['username']
+		print('Currently logged in user:', request.session['username'])
+	except KeyError:
+		print('No user logged in')
+		return redirect('login/')
+
 	context = { 'file_sys': gen_file_struct() }
 	return render(request, 'media/index.html', context)
+
+
+def login(request):
+	if request.method == 'POST':
+		form = GetUserForm(request.POST)
+		if form.is_valid():
+			user = User.objects.filter(
+				login=form.cleaned_data['login'],
+				password=form.cleaned_data['password']
+			)
+
+			if user == None:
+				return JsonResponse({}, status=404)
+
+			request.session['login'] = request.POST['login']
+
+			return redirect('/')
+
+	form = GetUserForm()
+	return render(request, 'media/login.html', {'form': form})
+
 
 def new_directory(request):
 	if request.method == 'POST':

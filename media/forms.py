@@ -5,6 +5,11 @@ from media.util import get_files, get_directories
 from .models import Directory, File
 
 
+class GetUserForm(forms.Form):
+	login = forms.CharField(label='Your login', max_length=200)
+	password = forms.CharField(label='Your password', max_length=200, widget=forms.PasswordInput)
+
+
 class AddDirectoryForm(forms.Form):
 	name = forms.CharField(label='Directory name', max_length=200)
 	description = forms.CharField(label='Description', max_length=1000, required=False)
