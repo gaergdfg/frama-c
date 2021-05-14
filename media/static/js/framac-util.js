@@ -94,6 +94,8 @@ function setFocusContent(sections) {
 				appendedChild.classList.add('warning')
 			else if (section.search(/Invalid/) != -1)
 				appendedChild.classList.add('error')
+			else
+				appendedChild.classList.add('text-centered')
 		}
 	})
 
