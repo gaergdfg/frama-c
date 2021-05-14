@@ -152,10 +152,14 @@ function runFile(normalRun = false) {
 	})
 }
 
-function openFile(target) {
+function openFile(fileName) {
 	files = document.getElementsByClassName("file")
+
+	let target
 	Array.prototype.map.call(files, file => {
 		file.classList.remove("active")
+		if (file.innerText == fileName)
+			target = file
 	})
 	target.classList.add("active")
 

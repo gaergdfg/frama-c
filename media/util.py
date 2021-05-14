@@ -10,15 +10,6 @@ def get_directories():
 def get_files():
 	return File.objects.filter(validity_flag=True)
 
-def gen_file_struct():
-	res = {}
-	directories = get_directories()
-
-	for directory in directories:
-		res[directory] = File.objects.filter(validity_flag=True, directory=directory)
-
-	return res
-
 
 section_regex = r' ((?:requires|ensures|assert|invariant|variant)[^;]*;)'
 section_type_regex = r'(requires|ensures|assert|invariant|variant)'

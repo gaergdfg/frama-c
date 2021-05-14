@@ -3,8 +3,9 @@ import subprocess
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.core import serializers
 
-from media.util import gen_file_struct, parse_file, update_sections
+from media.util import get_files, get_directories, parse_file, update_sections
 
 from .forms import *
 from .models import Directory, File, User
@@ -16,8 +17,7 @@ def index(request):
 	except KeyError:
 		return redirect('login/')
 
-	context = { 'file_sys': gen_file_struct() }
-	return render(request, 'media/index.html', context)
+	return render(request, 'media/index.html', {})
 
 
 def login(request):
@@ -38,7 +38,7 @@ def login(request):
 			return redirect('/')
 
 	form = GetUserForm()
-	return render(request, 'media/login.html', {'form': form})
+	return render(request, 'media/login.html', { 'form': form })
 
 def logout(request):
 	try:
@@ -70,7 +70,7 @@ def new_directory(request):
 			return redirect('/')
 
 	form = AddDirectoryForm()
-	return render(request, 'media/add_directory.html', {'form': form})
+	return render(request, 'media/add_directory.html', { 'form': form })
 
 def new_file(request):
 	if request.method == 'POST':
@@ -102,41 +102,59 @@ def new_file(request):
 	else:
 		form = AddFileForm()
 
-	return render(request, 'media/add_file.html', {'form': form})
+	return render(request, 'media/add_file.html', { 'form': form })
 
 def remove_directory(request):
 	if request.method == 'POST':
-		form = RemoveDirectoryForm(request.POST)
-		if form.is_valid():
-			directory = form.cleaned_data['directory']
-			directory.validity_flag = False
-			directory.save(update_fields=['validity_flag'])
+		directory_name = request.POST['directory']
 
-			print('Removed directory:', directory)
+		directory = Directory.objects.filter(name=directory_name).first()
+		if directory == None:
+			print('Directory doesnt exist')
+			return JsonResponse({}, status=200)
 
-			return redirect('/')
-		else:
-			print('Invalid form')
+		directory.validity_flag = False
+		directory.save(update_fields=['validity_flag'])
 
-	form = RemoveDirectoryForm()
-	return render(request, 'media/remove_directory.html', {'form': form})
+		print('Removed directory:', directory)
+
+		return JsonResponse({}, status=200)
+
+	return JsonResponse({}, status=400)
 
 def remove_file(request):
 	if request.method == 'POST':
-		form = RemoveFileForm(request.POST)
-		if form.is_valid():
-			file = form.cleaned_data['file']
-			file.validity_flag = False
-			file.save(update_fields=['validity_flag'])
+		file_name = request.POST['file']
 
-			print('Removed file:', file)
+		file = File.objects.filter(name=file_name).first()
+		if file == None:
+			print('File doesnt exist')
+			return JsonResponse({}, status=200)
 
-			return redirect('/')
-		else:
-			print('Invalid form')
+		file.validity_flag = False
+		file.save(update_fields=['validity_flag'])
 
-	form = RemoveFileForm()
-	return render(request, 'media/remove_file.html', {'form': form})
+		print('Removed file:', file)
+
+		return JsonResponse({}, status=200)
+
+	return JsonResponse({}, status=400)
+
+def get_user_directories(request):
+	if request.method == 'GET':
+		directories = get_directories()
+
+		return JsonResponse(serializers.serialize('json', directories), status=200, safe=False)
+
+	return JsonResponse({}, status=400)
+
+def get_user_files(request):
+	if request.method == 'GET':
+		files = get_files()
+
+		return JsonResponse(serializers.serialize('json', files), status=200, safe=False)
+
+	return JsonResponse({}, status=400)
 
 def get_file(request):
 	if request.method == 'GET':

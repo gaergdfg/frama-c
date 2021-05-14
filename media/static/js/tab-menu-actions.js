@@ -1,16 +1,7 @@
-const csrfTokenCookieRegex = /csrftoken=([a-zA-Z0-9]+);/
-
-
-function getScrfToken() {
-	return csrfTokenCookieRegex.exec(document.cookie)[1]
-}
-
 function setProver() {
 	csrfToken = getScrfToken()
-	if (csrfToken === undefined) {
-		alert('There was an error.')
-		return;
-	}
+	if (csrfToken === null)
+		return
 
 	options = document.getElementsByClassName('prover-choice-radio')
 
@@ -20,7 +11,7 @@ function setProver() {
 				type: 'POST',
 				url: '/set_prover/',
 				data: {
-					csrfmiddlewaretoken: csrfToken,
+					'csrfmiddlewaretoken': csrfToken,
 					'prover': options[i].value
 				},
 				success: () => {

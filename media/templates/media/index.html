@@ -14,18 +14,18 @@
 		<button onclick="runFile()">Run</button>
 		<a href="new_directory/">Create Directory</a>
 		<a href="new_file/">Upload File</a>
-		<a href="remove_directory/">Remove Directory</a>
-		<a href="remove_file/">Remove File</a>
 		<a href="logout/">Log out</a>
 	</div>
 	<div id="grid-wrapper">
-		<div id="grid-wrapper-file-system">
-			{% for directory, file_list in file_sys.items %}
-				<button class="file-sys-element directory">{{ directory.name }}/</button>
-				{% for file in file_list %}
-					<button class="file-sys-element file" onclick="openFile(this)">{{ file.name }}</button>
-				{% endfor %}
-			{% endfor %}
+		<div id="grid-wrapper-file-system" class="text-container"></div>
+		<div id="grid-wrapper-file-menu" class="text-container">
+			<label for="files">Choose a file to delete:</label><br>
+			<select id="file-list-delete" name="files"></select><br>
+			<button onclick="deleteFile()">Delete</button><br><br>
+
+			<label for="directories">Choose a directory to delete:</label><br>
+			<select id="directory-list-delete" name="directories"></select><br>
+			<button onclick="deleteDirectory()">Delete</button>
 		</div>
 		<div id="grid-wrapper-editor" class="text-container code-container">No file selected.</div>
 		<div id="grid-wrapper-elements" class="text-container">No file selected.</div>
@@ -66,6 +66,9 @@
 		</div>
 	</div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="{% static 'js/cookies.js' %}"></script>
+	<script src="{% static 'js/file-system.js' %}"></script>
+	<script src="{% static 'js/file-menu.js' %}"></script>
 	<script src="{% static 'js/tab-menu-actions.js' %}"></script>
 	<script src="{% static 'js/tab-menu.js' %}"></script>
 	<script src="{% static 'js/focus-elements.js' %}"></script>
