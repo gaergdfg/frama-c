@@ -137,7 +137,24 @@ div {
 	opacity: 1;
 }
 
-.active, .navbar .active, .navbar a:hover, .navbar button:hover, .file:hover {
+.collapsible {
+	background: var(--container-background-color);
+	color: var(--text-color);
+	float: left;
+	display: block;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 12px;
+	margin-right: 12px;
+	font-weight: bold;
+}
+
+.collapsible-content {
+	display: none;
+}
+
+.active, .navbar .active, .navbar a:hover, .navbar button:hover, .file:hover, .collapsible:hover {
 	background: var(--text-color);
 	color: var(--container-background-color);
 }

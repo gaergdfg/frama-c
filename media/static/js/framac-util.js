@@ -46,36 +46,58 @@ function setFocusContent(sections) {
 	isHeader = true
 	sections.map(section => {
 		child = document.createElement('div')
+		child.classList.add('focus-element')
+
 		appendedChild = parent.appendChild(child)
 
+		subSections = section.split('\n')
+
+		if (subSections.length > 1) {
+			button = document.createElement('button')
+			button.classList.add('collapsible')
+			button.innerText = '+'
+
+			appendedButton = appendedChild.appendChild(button)
+		}
+
 		innerChild = document.createElement('p')
-		innerChild.classList.add('focus-element', 'text-container')
-		innerChild.innerText = section
+		innerChild.classList.add('text-container')
+		innerChild.innerText = subSections[0]
 
 		appendedInnerChild = appendedChild.appendChild(innerChild)
+
+		if (subSections.length > 1) {
+			childVolume = document.createElement('p')
+			childVolume.classList.add('text-container', 'collapsible-content')
+			childVolume.innerText = subSections.splice(1).join('\n')
+
+			appendedChild.appendChild(childVolume)
+		}
 
 		if (isHeader) {
 			isHeader = false
 			if (section.search(/Prover '[^']+' not found/) != -1)
-				appendedInnerChild.classList.add('error')
+				appendedChild.classList.add('error')
 		} else {
 			if ((condition = section.search(/Goal ([a-zA-Z- ]+)/)) != -1) {
 				tooltip = document.createElement('span')
 				tooltip.innerText = section.match(/Goal ([a-zA-Z- ]+)/)[1]
 
-				appendedInnerChild.appendChild(tooltip)
+				appendedChild.appendChild(tooltip)
 			}
 
 			if (section.search(/Valid/) != -1)
-				appendedInnerChild.classList.add('valid')
+				appendedChild.classList.add('valid')
 			else if (section.search(/Unknown error/) != -1)
-				appendedInnerChild.classList.add('unknown-error')
+				appendedChild.classList.add('unknown-error')
 			else if (section.search(/Warning/) != -1)
-				appendedInnerChild.classList.add('warning')
+				appendedChild.classList.add('warning')
 			else if (section.search(/Invalid/) != -1)
-				appendedInnerChild.classList.add('error')
+				appendedChild.classList.add('error')
 		}
 	})
+
+	setFocusElementsOnClick()
 }
 
 function setResultData(result) {

@@ -12,10 +12,8 @@ from .models import Directory, File, User
 
 def index(request):
 	try:
-		request.session['username']
-		print('Currently logged in user:', request.session['username'])
+		request.session['login']
 	except KeyError:
-		print('No user logged in')
 		return redirect('login/')
 
 	context = { 'file_sys': gen_file_struct() }
@@ -32,6 +30,7 @@ def login(request):
 			)
 
 			if user == None:
+				print('Couldnt find that user')
 				return JsonResponse({}, status=404)
 
 			request.session['login'] = request.POST['login']
