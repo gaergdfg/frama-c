@@ -40,6 +40,14 @@ def login(request):
 	form = GetUserForm()
 	return render(request, 'media/login.html', {'form': form})
 
+def logout(request):
+	try:
+		del request.session['login']
+	except KeyError:
+		pass
+
+	return redirect('/login/')
+
 
 def new_directory(request):
 	if request.method == 'POST':
