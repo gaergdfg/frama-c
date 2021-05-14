@@ -46,11 +46,10 @@ function setFocusContent(sections) {
 	isHeader = true
 	sections.map(section => {
 		child = document.createElement('div')
-
 		appendedChild = parent.appendChild(child)
 
 		innerChild = document.createElement('p')
-		innerChild.classList.add('text-container')
+		innerChild.classList.add('focus-element', 'text-container')
 		innerChild.innerText = section
 
 		appendedInnerChild = appendedChild.appendChild(innerChild)
@@ -60,6 +59,13 @@ function setFocusContent(sections) {
 			if (section.search(/Prover '[^']+' not found/) != -1)
 				appendedInnerChild.classList.add('error')
 		} else {
+			if ((condition = section.search(/Goal ([a-zA-Z- ]+)/)) != -1) {
+				tooltip = document.createElement('span')
+				tooltip.innerText = section.match(/Goal ([a-zA-Z- ]+)/)[1]
+
+				appendedInnerChild.appendChild(tooltip)
+			}
+
 			if (section.search(/Valid/) != -1)
 				appendedInnerChild.classList.add('valid')
 			else if (section.search(/Unknown error/) != -1)
