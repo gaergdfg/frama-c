@@ -2,8 +2,6 @@ from django import forms
 
 from media.util import get_files, get_directories
 
-from .models import Directory, File
-
 
 class GetUserForm(forms.Form):
 	login = forms.CharField(label='Your login', max_length=200)

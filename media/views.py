@@ -27,11 +27,11 @@ def login(request):
 			user = User.objects.filter(
 				login=form.cleaned_data['login'],
 				password=form.cleaned_data['password']
-			)
+			).first()
 
 			if user == None:
-				print('Couldnt find that user')
-				return JsonResponse({}, status=404)
+				form = GetUserForm()
+				return render(request, 'media/login.html', { 'form': form })
 
 			request.session['login'] = request.POST['login']
 

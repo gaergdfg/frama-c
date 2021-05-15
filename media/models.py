@@ -4,12 +4,12 @@ from django.db import models
 
 
 def get_filename(instance, filename):
-	return os.path.join(f'uploads/{instance.owner.name}/', instance.name)
+	return os.path.join(f'uploads/{instance.owner.login}/', instance.name)
 
 
 class User(models.Model):
-	name = models.CharField(primary_key = True, unique = True, max_length = 200)
-	login = models.CharField(max_length = 200)
+	name = models.CharField(max_length = 200)
+	login = models.CharField(primary_key = True, unique = True, max_length = 200)
 	password = models.CharField(max_length = 200)
 
 	validity_flag = models.BooleanField(default = True)
