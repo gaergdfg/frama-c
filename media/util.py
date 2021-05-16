@@ -1,14 +1,19 @@
 import re
+
 from django.utils import timezone
 
 from media.models import *
 
 
-def get_directories():
-	return Directory.objects.filter(validity_flag=True)
+def get_directories(login):
+	user = User.objects.filter(login=login).first()
 
-def get_files():
-	return File.objects.filter(validity_flag=True)
+	return Directory.objects.filter(owner=user, validity_flag=True)
+
+def get_files(login):
+	user = User.objects.filter(login=login).first()
+	
+	return File.objects.filter(owner=user, validity_flag=True)
 
 
 section_regex = r' ((?:requires|ensures|assert|invariant|variant)[^;]*;)'
@@ -17,7 +22,7 @@ section_type_regex = r'(requires|ensures|assert|invariant|variant)'
 def count_lines(preffix):
 	return len(re.findall(r'\n', preffix))
 
-def parse_file(new_file, file_content):
+def parse_file(new_file, file_content, user):
 	line = 1
 	while True:
 		match = re.search(section_regex, file_content)
@@ -39,7 +44,7 @@ def parse_file(new_file, file_content):
 
 		section_category = SectionCategory(category=mapping[section_type], last_updated=timestamp)
 		status = Status(status=5, last_updated=timestamp)
-		status_data = StatusData(user=User.objects.first(), last_updated=timestamp)
+		status_data = StatusData(user=user, last_updated=timestamp)
 		section_category.save()
 		status.save()
 		status_data.save()

@@ -53,7 +53,7 @@ def new_directory(request):
 	if request.method == 'POST':
 		form = AddDirectoryForm(request.POST)
 		if form.is_valid():
-			user = User.objects.first()
+			user = User.objects.filter(login=request.session['login']).first()
 			timestamp = timezone.now()
 
 			new_directory = Directory(
@@ -65,8 +65,6 @@ def new_directory(request):
 			)
 			new_directory.save()
 
-			print('Successfully created a directory:', new_directory)
-
 			return redirect('/')
 
 	form = AddDirectoryForm()
@@ -74,9 +72,9 @@ def new_directory(request):
 
 def new_file(request):
 	if request.method == 'POST':
-		form = AddFileForm(request.POST, request.FILES)
+		form = AddFileForm(request.POST, request.FILES, login=request.session['login'])
 		if form.is_valid():
-			user = User.objects.first()
+			user = User.objects.filter(login=request.session['login']).first()
 			timestamp = timezone.now()
 
 			file_content = request.FILES['source'].read().decode('utf-8')
@@ -92,15 +90,11 @@ def new_file(request):
 			)
 			new_file.save()
 
-			parse_file(new_file, file_content)
-
-			print('Successfully created a file:', new_file)
+			parse_file(new_file, file_content, user)
 
 			return redirect('/')
-		else:
-			print('Invalid form')
 	else:
-		form = AddFileForm()
+		form = AddFileForm(login=request.session['login'])
 
 	return render(request, 'media/add_file.html', { 'form': form })
 
@@ -110,13 +104,10 @@ def remove_directory(request):
 
 		directory = Directory.objects.filter(name=directory_name).first()
 		if directory == None:
-			print('Directory doesnt exist')
 			return JsonResponse({}, status=200)
 
 		directory.validity_flag = False
 		directory.save(update_fields=['validity_flag'])
-
-		print('Removed directory:', directory)
 
 		return JsonResponse({}, status=200)
 
@@ -128,21 +119,30 @@ def remove_file(request):
 
 		file = File.objects.filter(name=file_name).first()
 		if file == None:
-			print('File doesnt exist')
 			return JsonResponse({}, status=200)
 
 		file.validity_flag = False
 		file.save(update_fields=['validity_flag'])
 
-		print('Removed file:', file)
-
 		return JsonResponse({}, status=200)
 
 	return JsonResponse({}, status=400)
 
+def get_user(request):
+	if request.method == 'GET':
+		try:
+			return JsonResponse({ 'login': request.session['login'] })
+		except:
+			pass
+
+	return JsonResponse({}, status=400) 
+
 def get_user_directories(request):
 	if request.method == 'GET':
-		directories = get_directories()
+		try:
+			directories = get_directories(request.session['login'])
+		except KeyError:
+			return JsonResponse({}, status=400)
 
 		return JsonResponse(serializers.serialize('json', directories), status=200, safe=False)
 
@@ -150,7 +150,10 @@ def get_user_directories(request):
 
 def get_user_files(request):
 	if request.method == 'GET':
-		files = get_files()
+		try:
+			files = get_files(request.session['login'])
+		except KeyError:
+			return JsonResponse({}, status=400)
 
 		return JsonResponse(serializers.serialize('json', files), status=200, safe=False)
 
@@ -169,7 +172,8 @@ def get_file(request):
 
 def run_file(request):
 	if request.method == 'GET':
-		file_name = f'./uploads/{User.objects.first().name}/{request.GET["file"]}'
+		username = User.objects.filter(login=request.session['login']).first().name
+		file_name = f'./uploads/{username}/{request.GET["file"]}'
 
 		normal_run = False
 		try:

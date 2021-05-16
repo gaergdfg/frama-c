@@ -13,6 +13,7 @@ urlpatterns = [
     path('remove_directory/', views.remove_directory),
     path('remove_file/', views.remove_file),
 
+    path('user/', views.get_user),
     path('user_files/', views.get_user_files),
     path('user_directories/', views.get_user_directories),
     path('file/', views.get_file),
