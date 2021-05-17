@@ -128,15 +128,6 @@ def remove_file(request):
 
 	return JsonResponse({}, status=400)
 
-def get_user(request):
-	if request.method == 'GET':
-		try:
-			return JsonResponse({ 'login': request.session['login'] })
-		except:
-			pass
-
-	return JsonResponse({}, status=400) 
-
 def get_user_directories(request):
 	if request.method == 'GET':
 		try:
