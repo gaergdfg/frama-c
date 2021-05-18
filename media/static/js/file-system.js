@@ -35,8 +35,6 @@ async function getFileSystem() {
 	let directoryMapping = {}
 	let { files, directories } = await getFilesDirectories()
 
-	console.log(files, directories)
-
 	directories.map(directory => {
 		directoryMapping[directory.pk] = directory.fields.name
 		fileSystem[directory.fields.name] = []
