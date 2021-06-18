@@ -7,6 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from media.models import *
 from media.views import *
 from media.forms import *
+from media.util import *
 
 
 ##################### MODEL TESTS #####################
@@ -462,7 +463,17 @@ class LogoutViewTests(TestCase):
 @tag('view')
 class NewDirectoryViewTests(TestCase):
 	def setUp(self):
-		self.factory = RequestFactory()
+		self.session = self.client.session
+		self.session['login'] = 'test_login'
+		self.session.save()
+
+		user = User(
+			name='test_name',
+			login='test_login',
+			password='test_password',
+			last_updated=timezone.now()
+		)
+		user.save()
 
 	def test_new_directory_incorrect_method(self):
 		response = self.client.get('/new_directory/')
@@ -472,21 +483,82 @@ class NewDirectoryViewTests(TestCase):
 		response = self.client.post('/new_directory/', data={})
 		self.assertEquals(response.status_code, 200)
 
+	def test_new_directory_correct_data(self):
+		data = {
+			'name': 'test_name',
+			'description': 'test_description',
+		}
+
+		response = self.client.post('/new_directory/', data=data)
+		self.assertRedirects(
+			response,
+			'/',
+			status_code=302,
+			target_status_code=200,
+			fetch_redirect_response=True
+		)
+
+		created_dir = Directory.objects.filter(name='test_name')
+		self.assertEquals(len(created_dir), 1)
+
 
 @tag('view')
 class NewFileViewTests(TestCase):
 	def setUp(self):
-		self.factory = RequestFactory()
+		self.session = self.client.session
+		self.session['login'] = 'test_login'
+		self.session.save()
 
-# TODO: requires request.session
-	# def test_new_file_incorrect_method(self):
-	# 	response = self.client.get('/new_file/')
-	# 	self.assertEquals(response.status_code, 200)
+	def test_new_file_incorrect_method(self):
+		response = self.client.get('/new_file/')
+		self.assertEquals(response.status_code, 200)
 
-# TODO: requires request.session
-	# def test_new_file_incorrect_data(self):
-	# 	response = self.client.post('/new_file/', data={})
-	# 	self.assertEquals(response.status_code, 200)
+	def test_new_file_incorrect_data(self):
+		response = self.client.post('/new_file/', data={})
+		self.assertEquals(response.status_code, 200)
+
+# TODO: fix this test (redirect returns 200 code)
+	# def test_new_file_correct_data(self):
+	# 	user = User(
+	# 		name='test_name',
+	# 		login='test_login',
+	# 		password='test_password',
+	# 		last_updated=timezone.now()
+	# 	)
+	# 	user.save()
+
+	# 	directory = Directory(
+	# 		owner=user,
+	# 		name='test_name',
+	# 		description='test_description',
+	# 		creation_date=timezone.now(),
+	# 		last_updated=timezone.now()
+	# 	)
+	# 	directory.save()
+
+	# 	source = SimpleUploadedFile(
+	# 		"test_name.test",
+	# 		b"test_file_content"
+	# 	)
+
+	# 	data = {
+	# 		'parent_directory': directory,
+	# 		'name': 'test_name',
+	# 		'description': 'test_description',
+	# 		'source': source
+	# 	}
+
+	# 	response = self.client.post('/new_file/', data=data)
+	# 	self.assertRedirects(
+	# 		response,
+	# 		'/',
+	# 		status_code=302,
+	# 		target_status_code=200,
+	# 		fetch_redirect_response=True
+	# 	)
+
+	# 	created_file = File.objects.filter(name='test_name')
+	# 	self.assertEquals(len(created_file), 1)
 
 
 @tag('view')
@@ -529,11 +601,35 @@ class GetUserDirectoriesViewTests(TestCase):
 		response = self.client.post('/user_directories/')
 		self.assertEqual(response.status_code, 400)
 
+	def test_get_user_directories_correct_user(self):
+		self.session = self.client.session
+		self.session['login'] = 'test_login'
+		self.session.save()
+
+		response = self.client.get('/user_directories/')
+		self.assertEqual(response.status_code, 200)
+
+	def test_get_user_directories_incorrect_user(self):
+		response = self.client.get('/user_directories/')
+		self.assertEqual(response.status_code, 400)
+
 
 @tag('view')
 class GetUserFilesViewTests(TestCase):
 	def test_get_user_files_incorrect_method(self):
 		response = self.client.post('/user_files/')
+		self.assertEqual(response.status_code, 400)
+
+	def test_get_user_files_correct_user(self):
+		self.session = self.client.session
+		self.session['login'] = 'test_login'
+		self.session.save()
+
+		response = self.client.get('/user_files/')
+		self.assertEqual(response.status_code, 200)
+
+	def test_get_user_files_incorrect_user(self):
+		response = self.client.get('/user_files/')
 		self.assertEqual(response.status_code, 400)
 
 
@@ -583,43 +679,47 @@ class GetFileViewTests(TestCase):
 
 @tag('view')
 class RunFileViewTests(TestCase):
-# TODO: requires request.session
-	# def test_run_file_correct_data(self):
-	# 	user = User(
-	# 		name='test_name',
-	# 		login='test_login',
-	# 		password='test_password',
-	# 		last_updated=timezone.now()
-	# 	)
-	# 	user.save()
+	def setUp(self):
+		self.session = self.client.session
+		self.session['login'] = 'test_login'
+		self.session.save()
 
-	# 	directory = Directory(
-	# 		owner=user,
-	# 		name='test_name',
-	# 		description='test_description',
-	# 		creation_date=timezone.now(),
-	# 		last_updated=timezone.now()
-	# 	)
-	# 	directory.save()
+	def test_run_file_correct_data(self):
+		user = User(
+			name='test_name',
+			login='test_login',
+			password='test_password',
+			last_updated=timezone.now()
+		)
+		user.save()
 
-	# 	source = SimpleUploadedFile(
-	# 		"test_name.test",
-	# 		b"test_file_content"
-	# 	)
+		directory = Directory(
+			owner=user,
+			name='test_name',
+			description='test_description',
+			creation_date=timezone.now(),
+			last_updated=timezone.now()
+		)
+		directory.save()
 
-	# 	file = File(
-	# 		owner=user,
-	# 		directory=directory,
-	# 		name='test_name.test',
-	# 		source=source,
-	# 		creation_date=timezone.now(),
-	# 		last_updated=timezone.now()
-	# 	)
-	# 	file.save()
+		source = SimpleUploadedFile(
+			"test_name.test",
+			b"test_file_content"
+		)
 
-	# 	data = { 'file': 'test_name.test' }
-	# 	response = self.client.get('/run_file/', data=data)
-	# 	self.assertEquals(response.status_code, 200)
+		file = File(
+			owner=user,
+			directory=directory,
+			name='test_name.test',
+			source=source,
+			creation_date=timezone.now(),
+			last_updated=timezone.now()
+		)
+		file.save()
+
+		data = { 'file': 'test_name.test' }
+		response = self.client.get('/run_file/', data=data)
+		self.assertEquals(response.status_code, 200)
 
 	def test_run_file_incorrect_method(self):
 		response = self.client.post('/run_file/')
@@ -730,3 +830,13 @@ class AddFileFormTests(TestCase):
 	def test_get_user_form_no_data(self):
 		with self.assertRaises(KeyError):
 			AddFileForm({})
+
+
+##################### UTIL TESTS #####################
+
+
+@tag('util')
+class utilTests(TestCase):
+	def test_count_lines(self):
+		example = '\n\n\r\n \n'
+		self.assertEquals(count_lines(example), 4)

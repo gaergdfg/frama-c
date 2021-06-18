@@ -1,4 +1,5 @@
 import subprocess
+from subprocess import PIPE
 
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
@@ -205,23 +206,31 @@ def run_file(request):
 			normal_args.append('-wp-print')
 		normal_args.append(file_name)
 
-		output = subprocess.run(normal_args, capture_output=True)
+		# output = subprocess.run(normal_args, stdout=PIPE, stderr=PIPE)
 
-		result_args = args
-		result_args.append('-wp-log=r:result.txt')
-		result_args.append(file_name)
+		# result_args = args
+		# result_args.append('-wp-log=r:result.txt')
+		# result_args.append(file_name)
 
-		subprocess.run(result_args)
+		# subprocess.run(result_args)
 
-		result = subprocess.run(['cat', 'result.txt'], capture_output=True)
-		subprocess.run(['rm', 'result.txt'])
+		# result = subprocess.run(['cat', 'result.txt'], stdout=PIPE, stderr=PIPE)
+		# subprocess.run(['rm', 'result.txt'])
 
-		if normal_run:
-			update_sections(request.GET['file'], output.stdout.decode('utf-8'))
+		# if normal_run:
+		# 	update_sections(request.GET['file'], output.stdout.decode('utf-8'))
+
+		# return JsonResponse({
+		# 	'framac_output': output.stdout.decode('utf-8'),
+		# 	'result_output': result.stdout.decode('utf-8')
+		# })
+
+		output = 'this would be the frama-c output'
+		result = 'this would be the frama-c result'
 
 		return JsonResponse({
-			'framac_output': output.stdout.decode('utf-8'),
-			'result_output': result.stdout.decode('utf-8')
+			'framac_output': output,
+			'result_output': result
 		})
 	else:
 		return JsonResponse({}, status=400)
